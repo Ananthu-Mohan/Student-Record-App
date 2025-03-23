@@ -1,0 +1,616 @@
+﻿@{
+    Layout = "_LayoutSimple";
+    ViewData["Title"] = "Student Application";
+}
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+
+    .parallax {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .backgroundImg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+    }
+
+    .visible {
+        opacity: 1 !important;
+    }
+
+    .card {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        z-index: 1;
+    }
+
+    .card h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .card p {
+        font-size: 16px;
+        color: #333;
+    }
+
+    .facility-thumbnail {
+        width: 100%;
+        max-width: 400px;
+        height: 70%;
+        height: auto;
+        object-fit: cover;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    @@keyframes pulsate {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.1);
+            opacity: 0.7;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @@keyframes fadeInOut {
+        0% {
+            opacity: 0;
+        }
+
+        50% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
+
+    .pulsating-text {
+        animation: pulsate 7s ease-in-out infinite;
+    }
+
+    .line-container {
+        width: 100%;
+        height: 2px;
+        background-color: #ddd;
+        position: relative;
+        margin-top: 20px;
+        overflow: hidden;
+    }
+
+    .line {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 2px;
+        background-color: limegreen;
+        animation: animateLine 5s ease infinite;
+    }
+
+    @@keyframes animateLine {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    .sub-line-container {
+        width: 20%;
+        height: 2px;
+        background-color: #ddd;
+        position: relative;
+        margin-top: 20px;
+        overflow: hidden;
+    }
+
+    .sub-line {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 2px;
+        background-color: crimson;
+        animation: animateLine 5s ease infinite;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: black;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        color: black;
+    }
+
+    .carousel-control-prev {
+        left: -130px;
+    }
+
+    .carousel-control-next {
+        right: -130px;
+    }
+
+    .award-item {
+        margin: 20px 0;
+        padding: 15px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .award-item h4 {
+        font-size: 1.5rem;
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+
+    .award-item p {
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .scrollable-card {
+        max-height: 800px;
+        overflow-y: auto; 
+        padding: 15px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 8px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    }
+
+    .scroll-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: white;
+        color: black;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        padding: 0;
+        font-size: 24px;
+        display: none;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        text-align: center;
+        line-height: 50px;
+    }
+
+    .scroll-to-top.show {
+        display: block;
+    }
+
+    .scroll-to-top:hover {
+        background-color: black;
+        color: white;
+    }
+</style>
+<div class="parallax" id="Home">
+    <img class="backgroundImg" src="~/images/img1.jpg" alt="Home" />
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="pulsating-text">Welcome to</h2>
+                            <h2 class="pulsating-text">Bright Horizons Academy</h2>
+                            <div class="line-container">
+                                <div class="line"></div>
+                            </div>
+                            <div class="text-content">
+                                <p class="p-5">
+                                    At Bright Horizons Academy, we are dedicated to providing an inspiring and nurturing environment where
+                                    students are encouraged to explore their full potential. With a strong emphasis on academic excellence,
+                                    personal growth, and community involvement, our school fosters creativity, critical thinking, and a love for lifelong learning.
+                                    Our dedicated educators work closely with each student, offering individualized support to ensure every child thrives academically,
+                                    socially, and emotionally. At Bright Horizons Academy, we believe that every student has the ability to make a positive impact on
+                                    the world, and we empower them to do so through education, compassion, and leadership.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="parallax" id="Facilities">
+    <img class="backgroundImg" src="~/images/img4.jpg" alt="Facilities" />
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div id="expertiseCarousel" class="carousel slide mt-5" data-bs-ride="carousel">
+                        <h2>Facilities</h2>
+                        <div class="line-container">
+                            <div class="line"></div>
+                        </div>
+                        <div class="carousel-inner mt-3">
+                            <div class="carousel-item active">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Library</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                Our state-of-the-art library at Bright Horizons Academy provides a rich collection of books, journals, and digital resources
+                                                for students of all ages. It is designed to foster a love for reading and support research-based learning.
+                                                With spacious reading areas and a quiet environment, students can explore various genres, conduct research, and develop critical
+                                                thinking skills. Our library also hosts workshops, author visits, and book clubs to engage students with the literary world.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <img src="~/images/library.jpg" alt="lib" class="facility-thumbnail" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Computer Lab</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                The Computer Lab at Bright Horizons Academy is equipped with the latest technology to ensure students gain essential digital
+                                                literacy skills. It offers access to high-speed internet, advanced software, and interactive learning tools. Whether for coding,
+                                                graphic design, or research, the lab is a hub for students to work on projects, collaborate with peers, and enhance their technical
+                                                proficiency. Regular classes and workshops are conducted to improve students' tech-savviness and problem-solving skills.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <img src="~/images/lab.jpg" alt="cl" class="facility-thumbnail" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Physical Education</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                Physical Education at Bright Horizons Academy emphasizes both physical fitness and teamwork. With a variety of sports facilities,
+                                                including basketball courts, swimming pools, and soccer fields, students engage in a wide range of physical activities.
+                                                The PE curriculum is designed to promote healthy habits, discipline, and collaboration among students. We also encourage
+                                                extracurricular sports, where students can participate in school teams and competitions, fostering a sense of achievement and
+                                                community.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <img src="~/images/pe.jpg" alt="pe" class="facility-thumbnail" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Chemistry Lab</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                The Chemistry Lab at Bright Horizons Academy is fully equipped with modern lab equipment to provide students with hands-on
+                                                learning experiences in science. Here, students conduct experiments, test hypotheses, and gain a deeper understanding of
+                                                chemical reactions and principles. The lab fosters curiosity and encourages a scientific mindset, where students learn to
+                                                work safely with chemicals and apparatus, preparing them for future careers in science, technology, and engineering.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <img src="~/images/chemistryLab.jpg" alt="chl" class="facility-thumbnail" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#expertiseCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#expertiseCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="parallax" id="Awards">
+    <img class="backgroundImg" src="~/images/img5.jpg" alt="Awards" />
+    <div class="card scrollable-card">
+        <h2>Awards & Recognition</h2>
+        <p>
+            Bright Horizons Academy has been consistently recognized for its excellence in academics, extracurricular achievements, and overall student development.
+            Here are some of our proudest moments:
+        </p>
+
+        <div class="award-item">
+            <h4>Best Academic Institution 2024</h4>
+            <p>
+                This prestigious award was presented to Bright Horizons Academy for its commitment to fostering academic excellence and providing innovative educational
+                programs that inspire students to reach their full potential.
+            </p>
+        </div>
+
+        <div class="award-item">
+            <h4>Excellence in Sports Achievement 2023</h4>
+            <p>
+                Our school received the Excellence in Sports Achievement award for the outstanding performance of our students in national and regional sports competitions.
+                The award recognizes our emphasis on physical education and teamwork.
+            </p>
+        </div>
+
+        <div class="award-item">
+            <h4>Best Community Engagement Program 2022</h4>
+            <p>
+                For our significant contributions to community service, Bright Horizons Academy was honored with the Best Community Engagement Program award.
+                We believe in the importance of instilling the values of compassion and social responsibility in our students.
+            </p>
+        </div>
+
+        <div class="award-item">
+            <h4>Innovative Teaching Award 2021</h4>
+            <p>
+                Our school was recognized for its creative and innovative teaching methods, particularly in the use of technology to enhance the learning experience.
+                This award celebrates our educators' ability to engage and inspire students in dynamic and impactful ways.
+            </p>
+        </div>
+
+        <div class="award-item">
+            <h4>Top Science Research School 2020</h4>
+            <p>
+                Bright Horizons Academy was recognized as one of the top schools in science research, with our students winning multiple science fair competitions at regional
+                and national levels. The award reflects our commitment to nurturing curiosity and innovation in STEM fields.
+            </p>
+        </div>
+    </div>
+</div>
+<div class="parallax" id="Education">
+    <img class="backgroundImg" src="~/images/img6.jpg" alt="Education" />
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div id="expertiseCarouselEd" class="carousel slide mt-5" data-bs-ride="carousel">
+                        <h2>Education</h2>
+                        <div class="line-container">
+                            <div class="line"></div>
+                        </div>
+                        <div class="carousel-inner mt-3">
+                            <div class="carousel-item active">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>STEM Education Program</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                Our STEM Education Program is designed to foster a strong foundation in Science, Technology, Engineering, and Mathematics.
+                                                Through hands-on projects, real-world problem solving, and exposure to cutting-edge technologies, students gain a deep 
+                                                understanding of these subjects. The program emphasizes creativity, critical thinking, and collaboration to prepare students 
+                                                for future careers in STEM fields.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Arts and Creativity Program</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                The Arts and Creativity Program at Bright Horizons Academy allows students to explore their artistic talents 
+                                                and develop their creativity. From visual arts to music, theater, and dance, this program encourages students to 
+                                                express themselves and find their unique voice. We believe that the arts are integral to a well-rounded education and 
+                                                play an essential role in emotional and cognitive development.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Leadership Development Program</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                Our Leadership Development Program is designed to cultivate leadership qualities in students.
+                                                Through mentorship, leadership workshops, team-building exercises, and community service projects, 
+                                                students develop the skills needed to become effective leaders. This program encourages students to take initiative,
+                                                think critically, and make impactful decisions in both academic and social contexts.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Global Studies and Cultural Exchange Program</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                Bright Horizons Academy offers a Global Studies and Cultural Exchange Program aimed at broadening students'
+                                                horizons and fostering a sense of global citizenship. Through collaborative projects, exchange programs with international
+                                                schools, and exposure to diverse cultures, students gain a deeper understanding of world history, politics, and 
+                                                social dynamics, preparing them for a connected and globalized world.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Environmental Sustainability Program</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                Our Environmental Sustainability Program focuses on educating students about the importance of environmental
+                                                conservation and sustainability. Students engage in hands-on activities such as tree planting, recycling initiatives,
+                                                and sustainability projects that help them understand how they can contribute to protecting the planet. 
+                                                The program empowers students to take action and make a positive difference in the world.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Entrepreneurship Program</h5>
+                                        <div class="sub-line-container" style="margin-left:350px;">
+                                            <div class="sub-line"></div>
+                                        </div>
+                                        <div class="text-content">
+                                            <p class="p-5">
+                                                The Entrepreneurship Program at Bright Horizons Academy provides students with the skills and mindset needed to
+                                                succeed in the world of business. Through interactive workshops, guest speakers, and real-world business simulations, 
+                                                students learn about innovation, business strategies, and financial management. The program encourages students to 
+                                                think creatively and take risks, preparing them for future entrepreneurial ventures.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#expertiseCarouselEd" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#expertiseCarouselEd" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button id="scrollToTopBtn" class="scroll-to-top">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("a").on("click", function (event) {
+            if (this.hash !== "") {
+                event.preventDefault();
+
+                var hash = this.hash;
+
+                $('html, body').animate({
+                    scrollTop: $(hash).offset().top
+                }, 800, function () {
+                    window.location.hash = hash;
+                });
+            }
+        });
+        function handleScroll() {
+            var scrollPosition = $(window).scrollTop();
+            var windowHeight = $(window).height();
+            $('.backgroundImg').each(function () {
+                var img = $(this);
+                var imgTop = img.offset().top;
+                var imgBottom = imgTop + img.height();
+                if (imgTop < (scrollPosition + windowHeight) && imgBottom > scrollPosition) {
+                    img.addClass('visible');
+                } else {
+                    img.removeClass('visible');
+                }
+                var parallaxSpeed = 0.8;
+                var parallaxOffset = (scrollPosition - imgTop) * parallaxSpeed;
+                img.css('transform', 'translate(-50%, -50%) translateY(' + parallaxOffset + 'px)');
+            });
+        }
+        handleScroll();
+        $(window).on('scroll', function () {
+            handleScroll();
+        });
+        const scrollToTopBtn = $("#scrollToTopBtn");
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 200) {
+                scrollToTopBtn.addClass("show");
+            } else {
+                scrollToTopBtn.removeClass("show");
+            }
+        });
+        scrollToTopBtn.click(function () {
+            $("html, body").animate({ scrollTop: $("#Home").offset().top }, 0);
+            return false;
+        });
+    });
+</script>

@@ -1,0 +1,712 @@
+﻿@model Students.Data.DTO.PaginatedList<Students.Data.Models.StudentsData>
+@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+    .recordData{
+        cursor: default;
+    }
+
+    .label-left {
+        text-align: left;
+        display: block;
+    }
+
+    .line-container {
+        width: 100%;
+        height: 2px;
+        background-color: #ddd;
+        position: relative;
+        margin-top: 20px;
+        overflow: hidden;
+    }
+
+    .line {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 2px;
+        background-color: darkviolet;
+        animation: animateLine 5s ease infinite;
+    }
+
+    @@keyframes animateLine {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+</style>
+<section class="py-3 py-md-5 ml-2">
+    <div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-12 col-xl-8 ms-0">
+                <div class="card widget-card border-light shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="card-title widget-card-title">Students Record data</h5>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#createStudentModal">
+                                Create new student
+                            </button>
+                        </div>
+                        <div class="line-container mt-3">
+                            <div class="line" style="background-color:darkorange;"></div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-borderless bsb-table-xl text-nowrap align-middle m-0">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Email</th>
+                                        <th>Date of Birth</th>
+                                        <th>Phone number</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Items.Count > 0)
+                                    {
+                                        @foreach (var data in Model.Items)
+                                        {
+                                            <tr onclick="showStudentDetailsSection(@data.Id)" class="recordData">
+                                                <td>
+                                                    <h6 class="mb-1">@data.FirstName</h6>
+                                                    <span class="text-secondary fs-7">@data.LastName</span>
+                                                </td>
+                                                <td>
+                                                    <h6 class="mb-1">@data.Email</h6>
+                                                    <span class="badge rounded-pill bg-success">Verified</span>
+                                                </td>
+                                                <td>
+                                                    <h6 class="mb-1">@(data.DateOfBirth.HasValue ? data.DateOfBirth.Value.ToString("yyyy-MM-dd") : "N/A")</h6>
+                                                    <span class="text-secondary fs-7">
+                                                        @if (data.DateOfBirth.HasValue)
+                                                        {
+                                                            var age = DateTime.Now.Year - data.DateOfBirth.Value.Year;
+                                                            if (DateTime.Now < data.DateOfBirth.Value.AddYears(age))
+                                                            {
+                                                                age--;
+                                                            }
+                                                            @:(@age + " years old")
+                                                        }
+                                                        else
+                                                        {
+                                                            @:("N/A")
+                                                        }
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <h6 class="mb-1">@data.PhoneNumber</h6>
+                                                    <span class="text-secondary fs-7">+1</span>
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-link" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots text-success"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <li>
+                                                                <a class="dropdown-item text-primary" href="javascript:void(0);"
+                                                                   onclick="showEditStudentModal(@data.Id)">
+                                                                    <i class="bi bi-pencil-fill"></i> Edit
+                                                                </a>
+                                                                <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                                   onclick="deleteStudent(@data.Id)">
+                                                                    <i class="bi bi-trash-fill"></i> Delete
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @{
+                            int totalPages = (int)Math.Ceiling((double)Model.TotalItems / Model.PageSize);
+                            int maxPagesToShow = 5;
+                            int startPage = Math.Max(1, Model.PageNumber - maxPagesToShow / 2);
+                            int endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
+                            if (endPage - startPage + 1 < maxPagesToShow)
+                            {
+                                startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+                            }
+                        }
+                        <div class="row mt-5">
+                            <div class="col-md-8">
+                                @if (Model.TotalItems > 0)
+                                {
+                                    <div class="pagination-info">
+                                        Showing @((Model.PageNumber - 1) * Model.PageSize + 1)
+                                        to @(Model.PageNumber * Model.PageSize > Model.TotalItems ? Model.TotalItems : Model.PageNumber * Model.PageSize)
+                                        of @Model.TotalItems entries
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-4">
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination" style="justify-content:right;">
+                                        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                                            <a class="page-link" href="?pageNumber=@(Model.PageNumber-1)&pageSize=@Model.PageSize">
+                                                Previous
+                                            </a>
+                                        </li>
+                                        @if (startPage > 1)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" href="?pageNumber=1&pageSize=@Model.PageSize">
+                                                    1
+                                                </a>
+                                            </li>
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        }
+                                        @for (int i = startPage; i <= endPage; i++)
+                                        {
+                                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                                <a class="page-link" href="?pageNumber=@i&pageSize=@Model.PageSize">
+                                                    @i
+                                                </a>
+                                            </li>
+                                        }
+                                        @if (endPage < totalPages)
+                                        {
+                                            <li class="page-item disabled">
+                                                <span class="page-link">
+                                                    ...
+                                                </span>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?pageNumber=@totalPages&pageSize=@Model.PageSize">
+                                                    @totalPages
+                                                </a>
+                                            </li>
+                                        }
+                                        <li class="page-item @(Model.PageNumber == totalPages ? "disabled" : "")">
+                                            <a class="page-link" href="?pageNumber=@(Model.PageNumber+1)&pageSize=@Model.PageSize">
+                                                Next
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           <div class="col-xl-4">
+                <section class="bsb-cta-3 studentDet d-none ">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="container-fluid bg-light border shadow">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card border-0 bg-transparent">
+                                                <div class="card-body text-center">
+                                                    <h4 class="fw-bold mb-4">Student's Details</h4>
+                                                    <div class="line-container mt-3">
+                                                        <div class="line"></div>
+                                                    </div>
+                                                    <div class="row mt-3">
+                                                        <div class="col-6">
+                                                            <label class="label-left">First name </label>
+                                                            <input class="form-control" type="type" name="firstName" id="fname" disabled />
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="label-left">Last name </label>
+                                                            <input class="form-control" type="type" name="lastName" id="lname" disabled />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-4">
+                                                        <div class="col-6">
+                                                            <label class="label-left">Phone number </label>
+                                                            <input class="form-control" type="type" name="phNumber" id="pno" disabled />
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="label-left">Gender</label>
+                                                            <input class="form-control" type="type" name="gender" id="gndr" disabled />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-4">
+                                                        <div class="col-6">
+                                                            <label class="label-left">Email </label>
+                                                            <input class="form-control" type="type" name="email" id="email" disabled />
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="label-left">Date of Birth</label>
+                                                            <input class="form-control" type="type" name="dob" id="dob" disabled />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-4">
+                                                        <div class="col-6">
+                                                            <label class="label-left">Major </label>
+                                                            <input class="form-control" type="type" name="major" id="mjr" disabled />
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="label-left">GPA</label>
+                                                            <input class="form-control" type="type" name="gpa" id="gpa" disabled />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row my-5">
+                                                        <h5>Address</h5>
+                                                        <p class="addTxt"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+           </div>
+        </div>
+    </div>
+</section>
+<!--Details Modal -->
+<div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="studentModalLabel">Student Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="studentDetailsContent">
+                    <div class="row">
+                        <div class="col-6">
+                            <label>First name </label>
+                            <input class="form-control" type="type" name="firstName" id="fname" disabled />
+                        </div>
+                        <div class="col-6">
+                            <label>Last name </label>
+                            <input class="form-control"  type="type" name="lastName" id="lname" disabled />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Phone number </label>
+                            <input class="form-control" type="type" name="phNumber" id="pno" disabled />
+                        </div>
+                        <div class="col-6">
+                            <label>Gender</label>
+                            <input class="form-control" type="type" name="gender" id="gndr" disabled />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Email </label>
+                            <input class="form-control" type="type" name="email" id="email" disabled />
+                        </div>
+                        <div class="col-6">
+                            <label>Date of Birth</label>
+                            <input class="form-control"  type="type" name="dob" id="dob" disabled />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Major </label>
+                            <input class="form-control"  type="type" name="major" id="mjr" disabled />
+                        </div>
+                        <div class="col-6">
+                            <label>GPA</label>
+                            <input class="form-control"  type="type" name="gpa" id="gpa" disabled />
+                        </div>
+                    </div>
+                    <div class="row my-5">
+                        <h5>Address</h5>
+                        <div class="col-2">
+                            <label>Street </label>
+                            <input class="form-control"  type="type" name="street" id="astrt" disabled />
+                        </div>
+                        <div class="col-2">
+                            <label>City</label>
+                            <input class="form-control"  type="type" name="city" id="acity" disabled />
+                        </div>
+                        <div class="col-2">
+                            <label>State</label>
+                            <input class="form-control" type="type" name="state" id="astat"  disabled />
+                        </div>
+                        <div class="col-2">
+                            <label>Postal Code</label>
+                            <input class="form-control" type="type" name="psCode" id="apsC"  disabled />
+                        </div>
+                        <div class="col-2">
+                            <label>Country</label>
+                            <input class="form-control"  type="type" name="country" id="aCnty" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Create Student Modal -->
+<div class="modal fade" id="createStudentModal" tabindex="-1" aria-labelledby="createStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createStudentModalLabel">Create New Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createStudentForm">
+                    <div class="row">
+                        <div class="col-6">
+                            <label>First Name </label>
+                            <input class="form-control" type="text" name="firstName" id="newFirstName" required />
+                        </div>
+                        <div class="col-6">
+                            <label>Last Name </label>
+                            <input class="form-control" type="text" name="lastName" id="newLastName" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Phone Number </label>
+                            <input class="form-control" type="text" name="phoneNumber" id="newPhoneNumber" required />
+                        </div>
+                        <div class="col-6">
+                            <label>Gender</label>
+                            <input class="form-control" type="text" name="gender" id="newGender" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Email </label>
+                            <input class="form-control" type="email" name="email" id="newEmail" required />
+                        </div>
+                        <div class="col-6">
+                            <label>Date of Birth</label>
+                            <input class="form-control" type="date" name="dateOfBirth" id="newDob" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Major </label>
+                            <input class="form-control" type="text" name="major" id="newMajor" required />
+                        </div>
+                        <div class="col-6">
+                            <label>GPA</label>
+                            <input class="form-control" type="text" name="gpa" id="newGPA" />
+                        </div>
+                    </div>
+                    <div class="row my-5">
+                        <h5>Address</h5>
+                        <div class="col-2">
+                            <label>Street </label>
+                            <input class="form-control" type="text" name="street" id="newStreet" />
+                        </div>
+                        <div class="col-2">
+                            <label>City</label>
+                            <input class="form-control" type="text" name="city" id="newCity" />
+                        </div>
+                        <div class="col-2">
+                            <label>State</label>
+                            <input class="form-control" type="text" name="state" id="newState" />
+                        </div>
+                        <div class="col-2">
+                            <label>Postal Code</label>
+                            <input class="form-control" type="text" name="postalCode" id="newPostalCode" />
+                        </div>
+                        <div class="col-2">
+                            <label>Country</label>
+                            <input class="form-control" type="text" name="country" id="newCountry" />
+                        </div>
+                        <div class="col-2">
+                            <label>District</label>
+                            <input class="form-control" type="text" name="district" id="newDistrict" />
+                        </div>
+                        <div class="col-2">
+                            <label>Apartment Number</label>
+                            <input class="form-control" type="text" name="apartmentNumber" id="newApartmentNumber" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit Student Modal -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStudentForm">
+                    <input type="hidden" id="editStudentId" />
+                    <div class="row">
+                        <div class="col-6">
+                            <label>First Name </label>
+                            <input class="form-control" type="text" name="firstName" id="editFirstName" required />
+                        </div>
+                        <div class="col-6">
+                            <label>Last Name </label>
+                            <input class="form-control" type="text" name="lastName" id="editLastName" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Phone Number </label>
+                            <input class="form-control" type="text" name="phoneNumber" id="editPhoneNumber" required />
+                        </div>
+                        <div class="col-6">
+                            <label>Gender</label>
+                            <input class="form-control" type="text" name="gender" id="editGender" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Email </label>
+                            <input class="form-control" type="email" name="email" id="editEmail" required />
+                        </div>
+                        <div class="col-6">
+                            <label>Date of Birth</label>
+                            <input class="form-control" type="date" name="dateOfBirth" id="editDob" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Major </label>
+                            <input class="form-control" type="text" name="major" id="editMajor" required />
+                        </div>
+                        <div class="col-6">
+                            <label>GPA</label>
+                            <input class="form-control" type="text" name="gpa" id="editGPA" />
+                        </div>
+                    </div>
+                    <div class="row my-5">
+                        <h5>Address</h5>
+                        <div class="col-2">
+                            <label>Street </label>
+                            <input class="form-control" type="text" name="street" id="editStreet" />
+                        </div>
+                        <div class="col-2">
+                            <label>City</label>
+                            <input class="form-control" type="text" name="city" id="editCity" />
+                        </div>
+                        <div class="col-2">
+                            <label>State</label>
+                            <input class="form-control" type="text" name="state" id="editState" />
+                        </div>
+                        <div class="col-2">
+                            <label>Postal Code</label>
+                            <input class="form-control" type="text" name="postalCode" id="editPostalCode" />
+                        </div>
+                        <div class="col-2">
+                            <label>Country</label>
+                            <input class="form-control" type="text" name="country" id="editCountry" />
+                        </div>
+                        <div class="col-2">
+                            <label>District</label>
+                            <input class="form-control" type="text" name="district" id="editDistrict" />
+                        </div>
+                        <div class="col-2">
+                            <label>Apartment Number</label>
+                            <input class="form-control" type="text" name="apartmentNumber" id="editApartmentNumber" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        var studentId;
+        function showStudentDetails(id) {
+            studentId = id;
+            $.ajax({
+                url: '@Url.Action("Details", "Home")/' + studentId,
+                type: 'GET',
+                success: function (response) {
+                    $("#fname").val(response.firstName);
+                    $("#lname").val(response.lastName);
+                    $("#pno").val(response.phoneNumber);
+                    $("#gndr").val(response.gender);
+                    $("#email").val(response.email);
+                    $("#dob").val(response.dateOfBirth);
+                    $("#mjr").val(response.major);
+                    $("#gpa").val(response.gpa);
+                    $("#astrt").val(response.address.street);
+                    $("#acity").val(response.address.city);
+                    $("#astat").val(response.address.state);
+                    $("#apsC").val(response.address.postalCode);
+                    $("#aCnty").val(response.address.country);
+                    $('#studentModal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    alert('Error fetching student details');
+                }
+            });
+        }
+        function showStudentDetailsSection(id) {
+            studentId = id;
+            $.ajax({
+                url: '@Url.Action("Details", "Home")/' + studentId,
+                type: 'GET',
+                success: function (response) {
+                    $("#fname").val(response.firstName);
+                    $("#lname").val(response.lastName);
+                    $("#pno").val(response.phoneNumber);
+                    $("#gndr").val(response.gender);
+                    $("#email").val(response.email);
+                    $("#dob").val(response.dateOfBirth);
+                    $("#mjr").val(response.major);
+                    $("#gpa").val(response.gpa);
+                    var address = response.address.street + ', ' +
+                        response.address.city + ', ' +
+                        response.address.state + ', ' +
+                        response.address.postalCode + ', ' +
+                        response.address.country;
+                    $(".addTxt").text(address);
+                },
+                error: function (xhr, status, error) {
+                    alert('Error fetching student details');
+                }
+            });
+            const studentDetailSection = document.querySelector(".studentDet");
+            studentDetailSection.classList.remove("d-none");
+        }
+        function deleteStudent(id) {
+            studentId = id;
+            $.ajax({
+                url: '@Url.Action("Delete", "Home")/' + studentId,
+                type: 'GET',
+                success: function (response) {
+                    alert('Student deleted successfully!');
+                    refreshStudentTable();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error deleting student');
+                }
+            });
+        }
+
+        $('#createStudentModal').on('shown.bs.modal', function () {
+            $("#createStudentForm")[0].reset();
+        });
+        $("#createStudentForm").submit(function (e) {
+            e.preventDefault();
+            var studentData = {
+                firstName: $("#newFirstName").val(),
+                lastName: $("#newLastName").val(),
+                phoneNumber: $("#newPhoneNumber").val(),
+                gender: $("#newGender").val(),
+                email: $("#newEmail").val(),
+                dateOfBirth: $("#newDob").val(),
+                major: $("#newMajor").val(),
+                gpa: $("#newGPA").val(),
+                address: {
+                    street: $("#newStreet").val(),
+                    city: $("#newCity").val(),
+                    state: $("#newState").val(),
+                    postalCode: $("#newPostalCode").val(),
+                    country: $("#newCountry").val(),
+                    apartmentNumber: $("#newApartmentNumber").val(),
+                    district: $("#newDistrict").val()
+                }
+            };
+            $.ajax({
+                url: '@Url.Action("Create", "Home")',
+                type: 'POST',
+                data: studentData,
+                success: function (response) {
+                    $('#createStudentModal').modal('hide');
+                    alert('Student created successfully!');
+                    refreshStudentTable();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error creating student');
+                }
+            });
+        });
+        function refreshStudentTable() {
+            window.location.reload();
+        }
+        function showEditStudentModal(id) {
+            studentId = id;
+            $.ajax({
+                url: '@Url.Action("Details", "Home")/' + studentId,
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    $("#editFirstName").val(response.firstName);
+                    $("#editLastName").val(response.lastName);
+                    $("#editPhoneNumber").val(response.phoneNumber);
+                    $("#editGender").val(response.gender);
+                    $("#editEmail").val(response.email);
+                    $("#editDob").val(response.dateOfBirth);
+                    $("#editMajor").val(response.major);
+                    $("#editGPA").val(response.gpa);
+                    $("#editStreet").val(response.address.street);
+                    $("#editCity").val(response.address.city);
+                    $("#editState").val(response.address.state);
+                    $("#editPostalCode").val(response.address.postalCode);
+                    $("#editCountry").val(response.address.country);
+                    $("#editApartmentNumber").val(response.address.apartmentNumber);
+                    $("#editDistrict").val(response.address.district);
+                    $('#editStudentModal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    alert('Error fetching student details for editing');
+                }
+            });
+            $("#editStudentForm").submit(function (e) {
+                e.preventDefault();
+                var studentData = {
+                    firstName: $("#editFirstName").val(),
+                    lastName: $("#editLastName").val(),
+                    phoneNumber: $("#editPhoneNumber").val(),
+                    gender: $("#editGender").val(),
+                    email: $("#editEmail").val(),
+                    dateOfBirth: $("#editDob").val(),
+                    major: $("#editMajor").val(),
+                    gpa: $("#editGPA").val(),
+                    address: {
+                        street: $("#editStreet").val(),
+                        city: $("#editCity").val(),
+                        state: $("#editState").val(),
+                        postalCode: $("#editPostalCode").val(),
+                        country: $("#editCountry").val(),
+                        apartmentNumber: $("#editApartmentNumber").val(),
+                        district: $("#editDistrict").val()
+                    }
+                };
+                $.ajax({
+                    url: '@Url.Action("Edit", "Home")/ ' + studentId,
+                    type: 'POST',
+                    data: studentData,
+                    success: function (response) {
+                        $('#editStudentModal').modal('hide');
+                        alert('Student updated successfully!');
+                        refreshStudentTable();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error updating student');
+                    }
+                });
+            });
+        }
+    </script>
+}
