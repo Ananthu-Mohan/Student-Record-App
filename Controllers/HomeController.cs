@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Students.Data.DTO;
 using Students.Data.Models;
 using Students.Data.Repositories;
 using StudentsRecordApplication.Models;
@@ -8,6 +7,8 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Students.Common.Models;
+using Students.Common.Services;
 
 namespace StudentsRecordApplication.Controllers
 {
@@ -17,6 +18,7 @@ namespace StudentsRecordApplication.Controllers
         private readonly IAddressService _addressService;
         private readonly ICourseService _courseService;
         private readonly ICourseEnrollmentService _courseEnrollmentService;
+        private readonly CsvGenerator _csvGenerator =  new CsvGenerator();
         public HomeController(IStudentsDataService studentsDataService,
             IAddressService addressService,
             ICourseService courseService,
@@ -34,15 +36,17 @@ namespace StudentsRecordApplication.Controllers
             {
                 searchParams = new SearchParams();
             }
-            var totalItemsCount = await _studentsDataService.GetStudentsCount(searchParams);
+            ViewBag.SearchString = searchParams.SearchString;
+            ViewBag.StartDate = searchParams.StartDate.HasValue ? searchParams.StartDate.Value.ToString("yyyy-MM-dd") : null;
+            ViewBag.EndDate = searchParams.EndDate.HasValue?searchParams.EndDate.Value.ToString("yyyy-MM-dd") : null; 
             searchParams.Paginator.PageNumber = pageNumber;
             searchParams.Paginator.PageSize = pageSize;
             var data = await _studentsDataService.GetAllStudentsData(searchParams);
-            if(data != null)
+            if(data.Item2 != null)
             {
                 var model = new PaginatedList<StudentsData>(
-                    data,
-                    totalItemsCount,
+                    data.Item2,
+                    data.Item1,
                     pageNumber,
                     pageSize
                     );
@@ -91,7 +95,7 @@ namespace StudentsRecordApplication.Controllers
                 await _studentsDataService.DeleteStudent(id);
                 return Json(new { success = true, message = "Student deleted successfully!" });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { success = false, message = "Error deleting student." });
             }
@@ -132,6 +136,20 @@ namespace StudentsRecordApplication.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetCsvRecord(SearchParams? searchParams)
+        {
+            if (searchParams == null)
+            {
+                searchParams = new SearchParams();
+            }
+            ViewBag.SearchString = searchParams.SearchString;
+            ViewBag.StartDate = searchParams.StartDate.HasValue ? searchParams.StartDate.Value.ToString("yyyy-MM-dd") : null;
+            ViewBag.EndDate = searchParams.EndDate.HasValue ? searchParams.EndDate.Value.ToString("yyyy-MM-dd") : null;
+            var data = await _studentsDataService.GetCsvRecord(searchParams);
+            var csvStream = await _csvGenerator.GenerateCsvAsync(data);
+            return File(csvStream, "text/csv", "students_data.csv");
         }
     }
 }

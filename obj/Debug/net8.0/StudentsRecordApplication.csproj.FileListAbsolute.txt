@@ -161,3 +161,7 @@ E:\Study time\StudentsRecordApp\StudentsRecordApplication\bin\Debug\net8.0\wwwro
 E:\Study time\StudentsRecordApp\StudentsRecordApplication\bin\Debug\net8.0\wwwroot\images\img2.jpg
 E:\Study time\StudentsRecordApp\StudentsRecordApplication\bin\Debug\net8.0\wwwroot\images\img3.jpg
 E:\Study time\StudentsRecordApp\StudentsRecordApplication\obj\Debug\net8.0\scopedcss\Views\Shared\_LayoutNoNav.cshtml.rz.scp.css
+E:\Study time\StudentsRecordApp\StudentsRecordApplication\obj\Debug\net8.0\StudentsRecordApplication.sourcelink.json
+E:\Study time\StudentsRecordApp\StudentsRecordApplication\bin\Debug\net8.0\Students.Common.dll
+E:\Study time\StudentsRecordApp\StudentsRecordApplication\bin\Debug\net8.0\Students.Common.pdb
+E:\Study time\StudentsRecordApp\StudentsRecordApplication\bin\Debug\net8.0\CsvHelper.dll

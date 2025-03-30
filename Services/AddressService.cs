@@ -1,4 +1,4 @@
-﻿using Students.Data.DTO;
+﻿using Students.Common.Models;
 using Students.Data.Models;
 using Students.Data.UnitOfWork;
 

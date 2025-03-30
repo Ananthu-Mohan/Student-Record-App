@@ -1,4 +1,4 @@
-﻿using Students.Data.DTO;
+﻿using Students.Common.Models;
 using Students.Data.Models;
 using Students.Data.UnitOfWork;
 
@@ -6,13 +6,14 @@ namespace StudentsRecordApplication.Services
 {
     public interface IStudentsDataService
     {
-        public Task<List<StudentsData>> GetAllStudentsData(SearchParams searchParams);
+        public Task<(int, List<StudentsData>)> GetAllStudentsData(SearchParams searchParams);
         public Task<StudentsData> GetStudentsData(long id);
         public Task<int> GetStudentsCount(SearchParams searchParams);
 
         public Task<StudentsData> CreateNewStudent(StudentsData student, Address address);
         public Task DeleteStudent(long id);
         public Task UpdateStudent(long id,StudentsData student);
+        public Task<List<StudentsData>> GetCsvRecord(SearchParams searchParams);
     }
     public class StudentsDataService : IStudentsDataService
     {
@@ -22,7 +23,7 @@ namespace StudentsRecordApplication.Services
             this._unitOfWork = _unitOfWork;
         }
 
-        public async Task<List<StudentsData>> GetAllStudentsData(SearchParams searchParams)
+        public async Task<(int, List<StudentsData>)> GetAllStudentsData(SearchParams searchParams)
             => await _unitOfWork.StudentsDataRepository.GetAllStudentsData(searchParams);
 
         public async Task<StudentsData> GetStudentsData(long id)
@@ -38,5 +39,8 @@ namespace StudentsRecordApplication.Services
 
         public async Task UpdateStudent(long id,StudentsData student)
          => await _unitOfWork.StudentsDataRepository.UpdateStudent(id,student);
+
+        public async Task<List<StudentsData>> GetCsvRecord(SearchParams searchParams)
+        => await _unitOfWork.StudentsDataRepository.GetCsvRecord(searchParams);
     }
 }
